@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World!</title>
+    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="drag_and_drop.css" />
+    <script defer src="./video_to_wav.js"></script>
+<!--    <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>-->
+
+  </head>
+  <body>
+  <div id="drop-area">
+      <form class="my-form">
+          <p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>
+          <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
+          <label class="button" for="fileElem">Select some files</label>
+          <div id="gallery" style="display: flex; justify-content: space-evenly; flex-wrap: wrap;" ></div>
+
+      </form>
+  </div>
+
+
+
+      <input type='file' accept=".mp4, .avi, .mov, .mp3" id="file"  />
+
+      <button type="button" onclick="test()" >Submit</button>
+
+
+  </body>
+</html>
