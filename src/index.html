@@ -7,20 +7,22 @@
     <script>
         let $ = jQuery = require("jquery");
     </script>
-    <script src="../node_modules/jquery/dist/jquery.slim.min.js"></script>
-    <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+<!--    <script src="../node_modules/jquery/dist/jquery.slim.min.js"></script>-->
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css" />
-<!--    <link rel="stylesheet" href="index.css"/>-->
+    <link rel="stylesheet" href="index.css"/>
     <link rel="stylesheet" href="drag_and_drop.css"/>
-<!--    <link rel="stylesheet" href="../dist/output.css">-->
+
     <script defer src="./video_to_wav.js"></script>
     <!--    <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>-->
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">Navbar</span>
+        <a href="./index.html" class="navbar-brand mb-0 h1">
+            Translator
+        </a>
     </div>
 </nav>
 
@@ -29,18 +31,35 @@
 <div id="homePage">
     <div class="container">
         <div id="drop-area" class="shadow">
+            
+            <div style="text-align: center" id="drag-and-drop-icon">
+                <img style="max-height: 10rem; " src="../public/download.png" alt="Drag and drop">
+                <h3> Dragging and Dropping </h3>
+            </div>
+
+            <div>
+
+                <div id="gallery" style="display: flex; justify-content: space-evenly; flex-wrap: wrap;"></div>
+            </div>
+
             <form class="my-form">
-                <p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>
+
 
                 <!--            <label class="button" for="file">Select some files</label>-->
-                <div id="gallery" style="display: flex; justify-content: space-evenly; flex-wrap: wrap;"></div>
-                <input type="file" id="file"  multiple accept="*" onchange="handleFiles(this.files)">
+
+                <input type="file" id="fileElem"  multiple accept="*" onchange="handleFiles(this.files)">
             </form>
         </div>
 
 
         <div class="bottom_div">
-            <button type="button" class="btn btn-primary" onclick="test()">Submit</button>
+            <button id="submitBtn" type="button" class="btn btn-primary" onclick="onSubmitButtonPressed()">
+                <span  id="loadingSpinner" class="spinner-border spinner-border-sm visually-hidden" role="status" aria-hidden="true"></span>
+                <span id="btnStatus">
+                    Submit
+                </span>
+
+            </button>
         </div>
 
     </div>
@@ -49,13 +68,28 @@
 
 
 <!--result page started from here-->
-<div id="resultPage" style="display: none">
-    <div class="container">
-        <button onclick="gotoHomePage()" class="p-3 red">Goto Home</button>
-        <h1>Result Page</h1>
-        <label>
-            <textarea id="resultTextArea" class="form-control" cols="100" rows="10"></textarea>
-        </label>
+<div id="resultPage" style="display: none;" >
+    <div class="container" style="padding-bottom: 15rem">
+        <label for="resultTextarea">Result</label>
+        <textarea style="width: 100%; resize: none" id="resultTextArea" class="form-control"  rows="10"></textarea>
+
+
+        <div class="d-flex flex-row justify-content-between mt-3">
+            <button  href="./index.html" class="btn btn-sm btn-success">Submit Again</button>
+<!--            <button onclick="gotoHomePage()" class="">Goto Home</button>-->
+            <div class="btn-group">
+                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Export As
+                </button>
+                <ul class="dropdown-menu">
+                    <li><button class="dropdown-item dropdown-item-text">srt</button> </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><button class="dropdown-item dropdown-item-text">sbv</button> </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><button class="dropdown-item dropdown-item-text">Text</button> </li>
+                </ul>
+            </div>
+        </div>
 
     </div>
 

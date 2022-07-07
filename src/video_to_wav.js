@@ -6,13 +6,21 @@ const deepl = require("deepl-node");
 // const $ = jQuery = require("jquery");
 const homePage = document.getElementById("homePage");
 const resultPage = document.getElementById("resultPage");
+const dragAndDropIcon = document.getElementById("drag-and-drop-icon");
+const submitBtn = document.getElementById("submitBtn")
+const loadingSpinner = document.getElementById("loadingSpinner");
+const btnStatus = document.getElementById("btnStatus");
+const fileElem = document.getElementById("fileElem");
 
-function gotoResultPage(){
+const hideClass = "visually-hidden";
+let fileList = [];
+
+function gotoResultPage() {
     homePage.style.display = "none";
     resultPage.style.display = "block";
 }
 
-function gotoHomePage(){
+function gotoHomePage() {
     resultPage.style.display = "none";
     homePage.style.display = "block";
 }
@@ -21,7 +29,7 @@ function gotoHomePage(){
     dropArea.addEventListener(eventName, preventDefaults, false)
 })
 
-function preventDefaults (e) {
+function preventDefaults(e) {
     e.preventDefault()
     e.stopPropagation()
 }
@@ -52,7 +60,9 @@ function handleDrop(e) {
 }
 
 function handleFiles(files) {
+    dragAndDropIcon.classList.add(hideClass);
     files = [...files]
+    fileList = files;
     files.forEach(uploadFile)
     files.forEach(previewFile)
 }
@@ -76,11 +86,11 @@ function uploadFile(file) {
 function previewFile(file) {
     let reader = new FileReader()
     reader.readAsDataURL(file)
-    reader.onloadend = function() {
+    reader.onloadend = function () {
         let div = document.createElement("div")
         let img = document.createElement('img',)
 
-        img.src = reader.result
+        img.src = "../public/videofilepng.png";
         img.style.maxWidth = "100px";
         img.style.maxHeight = "100px";
         console.log(file)
@@ -109,46 +119,56 @@ async function upload_document(text) {
 }
 
 
-
-function test(){
+function onSubmitButtonPressed() {
     event.preventDefault();
     console.log("test");
-    const resultTextArea = document.getElementById("resultTextArea");
-    const file = document.getElementById("file");
-    upload_document("Hello World").then(res => {
-        console.log(res);
-        gotoResultPage()
-        resultTextArea.value = res.text;
-    }).catch(err => console.log(err))
+
+    if (!submitBtn.disabled) {
+        submitBtn.disabled = true;
+        loadingSpinner.classList.remove("visually-hidden");
+        btnStatus.innerText = "Preprocessing...";
+
+    }
+    // const resultTextArea = document.getElementById("resultTextArea");
+
+    console.log(fileList);
+
+    convert(fileList[0].path).then(res => {
+        btnStatus.innerText = "Translating...";
+        translate().then(r => console.log(r)).catch(err => console.log(err));
+        console.log(res)
+    }).catch(err => {
+        console.log(err);
+    }).finally(() => {
+        // dragAndDropIcon.classList.remove(hideClass);
+    })
+
+
 
     // console.log(file.files[0].path)
 
-    // convert(file.files[0].path).then(res => {
-    //     console.log(res)
-    // })
+
 }
 
 const convert = async (inputFile) => {
+    console.log("Convert Function called");
     try {
-         await transcodeMediaFile(inputFile, 'my-output-file.raw', 'wav');
-        translate().catch(error => console.log(error));
-
+        await transcodeMediaFile(inputFile, 'my-output-file.raw', 'wav');
     } catch (e) {
         console.error(e);
     }
 
 };
 
-async function translate(){
-    console.log("translatsion started");
+async function translate() {
+    console.log("translation started");
     process.env.GOOGLE_APPLICATION_CREDENTIALS = "/Users/shakil/WebstormProjects/transtator_desktop/keys/speech-to-text-to-translation-607e6f57d39d.json"
     const client = new speech.SpeechClient()
     const filename = "/Users/shakil/WebstormProjects/transtator_desktop/my-output-file.raw";
 
     const file = fs.readFileSync(filename);
     const audioBytes = file.toString('base64');
-    console.log(audioBytes.slice(0, 100))
-
+    // console.log(audioBytes.slice(0, 100))
 
 
     const audio = {
@@ -169,10 +189,23 @@ async function translate(){
     }
 
     const [response] = await client.recognize(request);
-    const transcription = response.results.map( result =>
+    const transcription = response.results.map(result =>
         result.alternatives[0].transcript).join('\n');
+    console.log("translation done");
 
-    console.log(transcription)
+    btnStatus.innerText = "Almost Done Deepl Processing...";
+
+    upload_document(transcription).then(res => {
+        console.log(res);
+        gotoResultPage()
+        resultTextArea.value = res.text;
+    }).catch(err => console.log(err)).finally(() => {
+        submitBtn.disabled = false;
+        btnStatus.innerText = "Submit";
+        loadingSpinner.classList.add("visually-hidden")
+    })
+
+    return transcription;
 }
 
 

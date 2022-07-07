@@ -1,10 +1,13 @@
 #drop-area {
     border: 2px dashed #ccc;
     border-radius: 20px;
-    width: 480px;
+    min-height: 20rem;
     font-family: sans-serif;
-    margin: 100px auto;
     padding: 20px;
+    margin: 100px auto 2rem;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
 }
 #drop-area.highlight {
     border-color: purple;
@@ -16,7 +19,9 @@ p {
 
 }
 .my-form input {
-    margin-top: 5rem;
+
+    align-self: end;
+    align-content: end;
 }
 #gallery {
     margin-top: 10px;
