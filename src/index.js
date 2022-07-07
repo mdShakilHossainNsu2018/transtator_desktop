@@ -1,6 +1,5 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
-
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 // eslint-disable-next-line global-require
 if (require('electron-squirrel-startup')) {
@@ -47,6 +46,13 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+const env = process.env.NODE_ENV || 'development';
+
+// If development environment
+if (env === 'development') {
+  require('electron-reload')(__dirname)
+}
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.

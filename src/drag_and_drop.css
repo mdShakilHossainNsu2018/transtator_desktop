@@ -13,7 +13,10 @@ p {
     margin-top: 0;
 }
 .my-form {
-    margin-bottom: 5rem;
+
+}
+.my-form input {
+    margin-top: 5rem;
 }
 #gallery {
     margin-top: 10px;

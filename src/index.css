@@ -5,3 +5,8 @@ body {
   max-width: 38rem;
   padding: 2rem;
 }
+
+.bottom_div {
+  display: flex;
+  justify-content: space-evenly;
+}

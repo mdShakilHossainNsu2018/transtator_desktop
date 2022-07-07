@@ -1,31 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8"/>
     <title>Hello World!</title>
-    <link rel="stylesheet" href="index.css" />
-    <link rel="stylesheet" href="drag_and_drop.css" />
+    <!-- jQuery (Should be declared before other JS imports) -->
+    <script>
+        let $ = jQuery = require("jquery");
+    </script>
+    <script src="../node_modules/jquery/dist/jquery.slim.min.js"></script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css" />
+<!--    <link rel="stylesheet" href="index.css"/>-->
+    <link rel="stylesheet" href="drag_and_drop.css"/>
+<!--    <link rel="stylesheet" href="../dist/output.css">-->
     <script defer src="./video_to_wav.js"></script>
-<!--    <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>-->
-
-  </head>
-  <body>
-  <div id="drop-area">
-      <form class="my-form">
-          <p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>
-          <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
-          <label class="button" for="fileElem">Select some files</label>
-          <div id="gallery" style="display: flex; justify-content: space-evenly; flex-wrap: wrap;" ></div>
-
-      </form>
-  </div>
+    <!--    <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>-->
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">Navbar</span>
+    </div>
+</nav>
 
 
 
-      <input type='file' accept=".mp4, .avi, .mov, .mp3" id="file"  />
+<div id="homePage">
+    <div class="container">
+        <div id="drop-area" class="shadow">
+            <form class="my-form">
+                <p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>
 
-      <button type="button" onclick="test()" >Submit</button>
+                <!--            <label class="button" for="file">Select some files</label>-->
+                <div id="gallery" style="display: flex; justify-content: space-evenly; flex-wrap: wrap;"></div>
+                <input type="file" id="file"  multiple accept="*" onchange="handleFiles(this.files)">
+            </form>
+        </div>
 
 
-  </body>
+        <div class="bottom_div">
+            <button type="button" class="btn btn-primary" onclick="test()">Submit</button>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!--result page started from here-->
+<div id="resultPage" style="display: none">
+    <div class="container">
+        <button onclick="gotoHomePage()" class="p-3 red">Goto Home</button>
+        <h1>Result Page</h1>
+        <label>
+            <textarea id="resultTextArea" class="form-control" cols="100" rows="10"></textarea>
+        </label>
+
+    </div>
+
+</div>
+
+</body>
 </html>

@@ -1,15 +1,21 @@
-
 const {transcodeMediaFile} = require('symbl-media');
 const speech = require("@google-cloud/speech");
 const fs = require('fs');
-const {filename} = require("./third_party/browser.min");
+let dropArea = document.getElementById('drop-area');
+const deepl = require("deepl-node");
+// const $ = jQuery = require("jquery");
+const homePage = document.getElementById("homePage");
+const resultPage = document.getElementById("resultPage");
 
-let dropArea = document.getElementById('drop-area')
+function gotoResultPage(){
+    homePage.style.display = "none";
+    resultPage.style.display = "block";
+}
 
-// dropArea.addEventListener('dragenter', handlerFunction, false)
-// dropArea.addEventListener('dragleave', handlerFunction, false)
-// dropArea.addEventListener('dragover', handlerFunction, false)
-// dropArea.addEventListener('drop', handlerFunction, false)
+function gotoHomePage(){
+    resultPage.style.display = "none";
+    homePage.style.display = "block";
+}
 
 ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropArea.addEventListener(eventName, preventDefaults, false)
@@ -96,15 +102,30 @@ function previewFile(file) {
 }
 
 
+async function upload_document(text) {
+    const authKey = "aff6c53c-0c00-a7e5-01a8-bc65db9a474c"; // Replace with your key
+    const translator = new deepl.Translator(authKey);
+    return await translator.translateText(text, null, 'fr')// Bonjour, le monde !
+}
+
+
 
 function test(){
     event.preventDefault();
     console.log("test");
+    const resultTextArea = document.getElementById("resultTextArea");
     const file = document.getElementById("file");
-    console.log(file.files[0].path)
-    convert(file.files[0].path).then(res => {
-        console.log(res)
-    })
+    upload_document("Hello World").then(res => {
+        console.log(res);
+        gotoResultPage()
+        resultTextArea.value = res.text;
+    }).catch(err => console.log(err))
+
+    // console.log(file.files[0].path)
+
+    // convert(file.files[0].path).then(res => {
+    //     console.log(res)
+    // })
 }
 
 const convert = async (inputFile) => {
@@ -137,6 +158,8 @@ async function translate(){
     const config = {
         encoding: 'LINEAR16',
         // sampleRateHertz: 16000,
+        enableWordTimeOffsets: true,
+        enableAutomaticPunctuation: true,
         languageCode: "en-US"
     }
 
@@ -151,3 +174,6 @@ async function translate(){
 
     console.log(transcription)
 }
+
+
+
