@@ -3,6 +3,8 @@ const speech = require("@google-cloud/speech");
 const fs = require('fs');
 let dropArea = document.getElementById('drop-area');
 const deepl = require("deepl-node");
+const {Storage} = require("@google-cloud/storage");
+const path = require('path');
 // const $ = jQuery = require("jquery");
 const homePage = document.getElementById("homePage");
 const resultPage = document.getElementById("resultPage");
@@ -11,9 +13,20 @@ const submitBtn = document.getElementById("submitBtn")
 const loadingSpinner = document.getElementById("loadingSpinner");
 const btnStatus = document.getElementById("btnStatus");
 const fileElem = document.getElementById("fileElem");
-
+let resultText = "";
 const hideClass = "visually-hidden";
 let fileList = [];
+
+const gc = new Storage({
+    keyFilename: path.join(__dirname, "../keys/speech-to-text-to-translation-70c75135aace_storage.json"),
+    projectId: "speech-to-text-to-translation"
+})
+// (async () => {
+//     await gc.getBuckets().then(x => console.log(x));
+// })()
+
+gc.getBuckets().then(x => console.log(x));
+
 
 function gotoResultPage() {
     homePage.style.display = "none";
@@ -83,6 +96,19 @@ function uploadFile(file) {
     //     .catch(() => { /* Error. Inform the user */ })
 }
 
+function uploadFileToGC() {
+     const bucket = gc.bucket("data_voice")
+    bucket.upload("/Users/shakil/WebstormProjects/transtator_desktop/my-output-file.raw", function (err, file) {
+        console.log("Success");
+        console.log(file);
+        console.log(err);
+    })
+
+    console.log(` uploaded to `);
+}
+
+
+
 function previewFile(file) {
     let reader = new FileReader()
     reader.readAsDataURL(file)
@@ -115,13 +141,21 @@ function previewFile(file) {
 async function upload_document(text) {
     const authKey = "aff6c53c-0c00-a7e5-01a8-bc65db9a474c"; // Replace with your key
     const translator = new deepl.Translator(authKey);
-    return await translator.translateText(text, null, 'fr')// Bonjour, le monde !
+    return await translator.translateText(text, null, 'JA')// Bonjour, le monde !
+}
+
+function saveAsText() {
+    let FileSaver = require('file-saver');
+    let blob = new Blob([resultText], {type: "text/plain;charset=utf-8"});
+    FileSaver.saveAs(blob, "text.txt");
 }
 
 
 function onSubmitButtonPressed() {
     event.preventDefault();
     console.log("test");
+    // uploadFileToGC();
+
 
     if (!submitBtn.disabled) {
         submitBtn.disabled = true;
@@ -144,10 +178,21 @@ function onSubmitButtonPressed() {
     })
 
 
+}
 
-    // console.log(file.files[0].path)
-
-
+function msToHMS( ms ) {
+    // 1- Convert to seconds:
+    ms /= 1000000
+    let seconds = ms / 1000;
+    // 2- Extract hours:
+    const hours = parseInt( seconds / 3600 ); // 3,600 seconds in 1 hour
+    seconds = seconds % 3600; // seconds remaining after extracting hours
+    // 3- Extract minutes:
+    const minutes = parseInt( seconds / 60 ); // 60 seconds in 1 minute
+    // 4- Keep only seconds not extracted to minutes:
+    seconds = seconds % 60;
+    return `${hours}:${minutes}:${seconds},${ms}`
+    // alert( hours+":"+minutes+":"+seconds);
 }
 
 const convert = async (inputFile) => {
@@ -157,14 +202,16 @@ const convert = async (inputFile) => {
     } catch (e) {
         console.error(e);
     }
-
 };
 
+
+
+// todo
 async function translate() {
     console.log("translation started");
-    process.env.GOOGLE_APPLICATION_CREDENTIALS = "/Users/shakil/WebstormProjects/transtator_desktop/keys/speech-to-text-to-translation-607e6f57d39d.json"
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = path.join(__dirname, "../keys/speech-to-text-to-translation-607e6f57d39d.json");
     const client = new speech.SpeechClient()
-    const filename = "/Users/shakil/WebstormProjects/transtator_desktop/my-output-file.raw";
+    const filename = path.join(__dirname, "../my-output-file.raw");
 
     const file = fs.readFileSync(filename);
     const audioBytes = file.toString('base64');
@@ -189,15 +236,23 @@ async function translate() {
     }
 
     const [response] = await client.recognize(request);
+    console.log(response);
+
+    // response.results.forEach((result, index) => {
+    //     result.alternatives[index].words.forEach(word => {
+    //         console.log(msToHMS(word.startTime.nanos))
+    //     })
+    // })
     const transcription = response.results.map(result =>
         result.alternatives[0].transcript).join('\n');
-    console.log("translation done");
+    // console.log("translation done");
 
     btnStatus.innerText = "Almost Done Deepl Processing...";
 
     upload_document(transcription).then(res => {
         console.log(res);
-        gotoResultPage()
+        gotoResultPage();
+        resultText = res.text;
         resultTextArea.value = res.text;
     }).catch(err => console.log(err)).finally(() => {
         submitBtn.disabled = false;
